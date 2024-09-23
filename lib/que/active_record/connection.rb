@@ -68,7 +68,11 @@ module Que
             # see https://github.com/que-rb/que/pull/412#issuecomment-2194412783
             return if Que::ActiveRecord.active_rails_executor?
 
-            ::ActiveRecord::Base.clear_active_connections!
+            if ::ActiveRecord.version >= Gem::Version.new('7.1')
+              ::ActiveRecord::Base.connection_handler.clear_active_connections!(:all)
+            else
+              ::ActiveRecord::Base.clear_active_connections!
+            end
           end
         end
       end
